@@ -13,3 +13,10 @@ bzImage
 
 # Compiled userspace binaries
 dut/userspace_daemon/monitor_cli
+
+# Python & Test artifacts
+.venv/
+__pycach__/
+.pytest_cache/
+logs/
+*.pyc
