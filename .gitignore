@@ -2,3 +2,14 @@ src/
 build/
 *.cpio.gz
 bzImage
+# Kernel Module build artifacts
+*.ko
+*.o
+*.mod
+*.mod.c
+*.order
+*.symvers
+.*.cmd
+
+# Compiled userspace binaries
+dut/userspace_daemon/monitor_cli
