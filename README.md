@@ -1,2 +1,2 @@
 # linux-hil-val-suite
-Automated Linux Kernel &amp; Driver HIL validation framework using QEMU, BusyBox, and Python (pytest) in VM.
+Hands-on Linux Kernel & Embedded Systems engineering labs: custom bzImage, rootfs, C drivers, and QEMU automation.
