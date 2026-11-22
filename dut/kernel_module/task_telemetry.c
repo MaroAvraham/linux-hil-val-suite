@@ -140,7 +140,7 @@ static int __init telemetry_init(void)
         goto err_cdev;
 
     /* הערה: בקרנל 6.4+ class_create מקבלת פרמטר אחד. לקרנל 5.15 יש להוסיף THIS_MODULE כפרמטר ראשון */
-    telemetry_class = class_create(CLASS_NAME);
+    telemetry_class = class_create(THIS_MODULE, CLASS_NAME);
     if (IS_ERR(telemetry_class)) {
         ret = PTR_ERR(telemetry_class);
         goto err_class;
