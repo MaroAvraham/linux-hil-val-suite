@@ -1,6 +1,8 @@
 from pathlib import Path
 import pytest
 from harness.qemu_controller import QemuController
+import subprocess
+from harness.triage_collector import collect_triage
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 REPORTS_DIR = PROJECT_ROOT / "reports"

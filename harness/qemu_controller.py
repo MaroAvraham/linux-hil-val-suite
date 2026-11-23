@@ -61,7 +61,7 @@ class QemuController:
         ]
 
         if self.disk_path and self.disk_path.exists():
-            args.extend(["-drive", f"file={self.disk_path},format=raw,if=virtio"])
+            args.extend(["-drive", f"file={self.disk_path},format=raw,if=ide"])
 
         start_time = time.monotonic()
         self.process = pexpect.spawn(
@@ -80,8 +80,8 @@ class QemuController:
         # 2. המתנה ל-Prompt הראשוני של BusyBox
         self.process.expect(r"# ", timeout=5)
 
-        # 3. קביעת Prompt ייחודי (עם שרשור מחרוזות למניעת התאמה מוקדמת ב-echo)
-        self.process.sendline('export PS1="HIL_TARGET""# "')
+        # 3. כיבוי echo (מונע שבירת שורות בפקודות ארוכות) וקביעת Prompt ייחודי
+        self.process.sendline('stty -echo; export PS1="HIL_TARGET""# "')
         self.process.expect(self.CUSTOM_PROMPT, timeout=5)
 
         return self.boot_time_sec

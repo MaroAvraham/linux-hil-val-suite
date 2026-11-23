@@ -11,13 +11,12 @@ def test_daemon_sigkill_recovery_and_resource_release(dut):
     """
     dut.run_cmd("insmod /lib/modules/task_telemetry.ko 2>/dev/null || true")
 
-    pid = dut.run_cmd("monitor_cli --daemon > /tmp/daemon_kill.log 2>&1 & echo $!").stdout.strip()
+    pid = dut.run_cmd("monitor_cli --daemon < /dev/null > /tmp/daemon_kill.log 2>&1 & echo $!").stdout.strip()
     assert pid.isdigit()
     dut.run_cmd("sleep 1")
 
-    # הזרקת תקלה: הריגה מיידית ללא Cleanup
-    assert dut.run_cmd(f"kill -9 {pid}").exit_code == 0
-    dut.run_cmd("sleep 1")
+    # הזרקת תקלה + המתנה באותה פקודה כדי שה-SIGCHLD ייאסף בזמן ה-sleep ולא בזמן read()
+    assert dut.run_cmd(f"kill -9 {pid}; sleep 1").exit_code == 0
 
     # אימות שהתהליך מת
     assert dut.run_cmd(f"kill -0 {pid} 2>/dev/null").exit_code != 0

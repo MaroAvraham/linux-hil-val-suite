@@ -6,4 +6,6 @@ ip link set lo up
 echo "======================================"
 echo "  Linux HIL Validation Target Ready!  "
 echo "======================================"
-exec /bin/sh
+while true; do
+    /bin/sh
+done

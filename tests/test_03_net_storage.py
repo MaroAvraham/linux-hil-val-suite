@@ -5,14 +5,14 @@ from harness.log_analyzer import find_kernel_errors
 @pytest.mark.storage
 def test_virtio_blk_data_integrity(dut):
     """
-    מפרמט דיסק virtio-blk (/dev/vda), כותב קובץ בדיקה, מבצע sync,
+    מפרמט דיסק virtio-blk (/dev/sda), כותב קובץ בדיקה, מבצע sync,
     מנתק ומחבר מחדש ומוודא ש-sha256sum זהה לחלוטין.
     """
-    assert dut.run_cmd("ls /dev/vda").exit_code == 0, "virtio-blk device /dev/vda not found"
+    assert dut.run_cmd("ls /dev/sda").exit_code == 0, "virtio-blk device /dev/sda not found"
 
     # פרמוט ועגינה
-    assert dut.run_cmd("mkfs.ext2 -F /dev/vda").exit_code == 0
-    assert dut.run_cmd("mkdir -p /mnt/testdisk && mount /dev/vda /mnt/testdisk").exit_code == 0
+    assert dut.run_cmd("mkfs.ext2 -F /dev/sda").exit_code == 0
+    assert dut.run_cmd("mkdir -p /mnt/testdisk && mount /dev/sda /mnt/testdisk").exit_code == 0
 
     # כתיבת 2MB של נתונים אקראיים וחישוב Hash לפני ניתוק
     assert dut.run_cmd("dd if=/dev/urandom of=/mnt/testdisk/payload.bin bs=1M count=2").exit_code == 0
@@ -20,7 +20,7 @@ def test_virtio_blk_data_integrity(dut):
 
     # סנכרון מלא, ניתוק ועגינה מחדש כדי לוודא שהנתונים אכן נשמרו על הדיסק ולא רק ב-RAM Cache
     assert dut.run_cmd("sync && umount /mnt/testdisk").exit_code == 0
-    assert dut.run_cmd("mount /dev/vda /mnt/testdisk").exit_code == 0
+    assert dut.run_cmd("mount /dev/sda /mnt/testdisk").exit_code == 0
 
     hash_after = dut.run_cmd("sha256sum /mnt/testdisk/payload.bin").stdout.split()[0]
     dut.run_cmd("umount /mnt/testdisk")

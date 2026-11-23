@@ -1,4 +1,5 @@
 from harness.log_analyzer import find_kernel_errors
+import pytest
 
 @pytest.mark.sanity
 
