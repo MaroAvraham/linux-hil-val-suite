@@ -6,7 +6,6 @@ An end-to-end automated Linux Kernel, Character Driver (LKM), and System Integra
 
 ## Architecture
 
-```mermaid
 flowchart LR
     CI[GitHub Actions / Makefile] --> Docker[Docker Container ubuntu:22.04]
     subgraph Docker
