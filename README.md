@@ -1,12 +1,6 @@
 # Linux HIL Validation Suite
 
-[![Linux HIL Validation CI](https://github.com/MaroAvraham/linux-hil-val-suite/actions/workflows/ci_validation.yml/badge.svg)](https://github.com/MaroAvraham/linux-hil-val-suite/actions/workflows/ci_validation.yml)
 
-An end-to-end automated Linux Kernel, Character Driver (LKM), and System Integration validation framework running inside headless QEMU and Docker. Designed to verify `ioctl`/`sysfs` kernel boundaries, block storage integrity, concurrency locking, and `SIGKILL` fault recovery with zero host-OS dependencies.
-
-## Architecture
-
-```mermaid
 flowchart LR
     CI[GitHub Actions / Makefile] --> Docker[Docker Container ubuntu:22.04]
     subgraph Docker
