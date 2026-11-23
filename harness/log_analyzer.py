@@ -17,11 +17,7 @@ BENIGN_PATTERNS = [
 ]
 
 def find_kernel_errors(log_text: str) -> List[str]:
-    """
-    סורק טקסט (פלט dmesg או לוג Serial) ומחזיר רשימה של כל השורות
-    שבהן נמצא דפוס כשל קריטי של הקרנל.
-    """
-    compiled = [re.compile(pattern, re.IGNORECASE) for pattern in CRITICAL_KERNEL_PATTERNS]
+    compiled = [re.compile(pattern) for pattern in CRITICAL_KERNEL_PATTERNS]
     matches: List[str] = []
 
     for line in log_text.splitlines():
