@@ -1,5 +1,6 @@
 from harness.log_analyzer import find_kernel_errors
 
+@pytest.mark.sanity
 
 def test_boot_time_within_threshold(dut):
     """מוודא שהמערכת עלתה תוך פחות מ-10 שניות."""
