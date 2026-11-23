@@ -29,12 +29,14 @@ class QemuController:
         log_file: str = "logs/serial.log",
         memory: str = "512M",
         boot_timeout: int = 30,
+        disk_path: Optional[str] = None,
     ):
         self.kernel_path = Path(kernel_path)
         self.initrd_path = Path(initrd_path)
         self.log_file_path = Path(log_file)
         self.memory = memory
         self.boot_timeout = boot_timeout
+        self.disk_path = Path(disk_path) if disk_path else None
 
         self.process: Optional[pexpect.spawn] = None
         self._log_handle = None
@@ -57,6 +59,9 @@ class QemuController:
             "-nographic",
             "-append", "console=ttyS0 nokaslr quiet",
         ]
+
+        if self.disk_path and self.disk_path.exists():
+            args.extend(["-drive", f"file={self.disk_path},format=raw,if=virtio"])
 
         start_time = time.monotonic()
         self.process = pexpect.spawn(
