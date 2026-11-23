@@ -20,3 +20,6 @@ __pycach__/
 .pytest_cache/
 logs/
 *.pyc
+
+# Test HTML & JUnit reports
+reports/
