@@ -50,30 +50,33 @@ class QemuController:
         self.log_file_path.parent.mkdir(parents=True, exist_ok=True)
         self._log_handle = open(self.log_file_path, "w", encoding="utf-8", errors="replace")
 
-        cmd = (
-            f"qemu-system-x86_64 "
-            f"-kernel {self.kernel_path} "
-            f"-initrd {self.initrd_path} "
-            f"-m {self.memory} "
-            f"-nographic "
-            f'-append "console=ttyS0 nokaslr quiet"'
-        )
+        args = [
+            "-kernel", str(self.kernel_path),
+            "-initrd", str(self.initrd_path),
+            "-m", self.memory,
+            "-nographic",
+            "-append", "console=ttyS0 nokaslr quiet",
+        ]
 
         start_time = time.monotonic()
         self.process = pexpect.spawn(
-            cmd,
+            "qemu-system-x86_64",
+            args=args,
             encoding="utf-8",
             codec_errors="replace",
             timeout=self.boot_timeout,
             logfile=self._log_handle,
         )
 
-        # המתנה ל-Prompt הראשוני של BusyBox
-        self.process.expect(self.INITIAL_PROMPT, timeout=self.boot_timeout)
+        # 1. המתנה לבאנר מה-initramfs לוודא שהעלייה הושלמה
+        self.process.expect("Linux HIL Validation Target Ready!", timeout=self.boot_timeout)
         self.boot_time_sec = round(time.monotonic() - start_time, 2)
 
-        # קביעת Prompt ייחודי וברור כדי למנוע זיהוי שגוי בפלט של פקודות
-        self.process.sendline(f'export PS1="{self.CUSTOM_PROMPT}"')
+        # 2. המתנה ל-Prompt הראשוני של BusyBox
+        self.process.expect(r"# ", timeout=5)
+
+        # 3. קביעת Prompt ייחודי (עם שרשור מחרוזות למניעת התאמה מוקדמת ב-echo)
+        self.process.sendline('export PS1="HIL_TARGET""# "')
         self.process.expect(self.CUSTOM_PROMPT, timeout=5)
 
         return self.boot_time_sec
@@ -94,9 +97,12 @@ class QemuController:
         if lines and command in lines[0]:
             lines = lines[1:]
 
+        # בתוך run_cmd(), החלף את הלולאה כך:
         exit_code = -1
         clean_lines = []
         for line in lines:
+            if marker in line and "$?" in line:
+                continue  # דילוג על שורת ה-echo של הפקודה עצמה
             match = re.search(rf"{marker}(\d+)", line)
             if match:
                 exit_code = int(match.group(1))
