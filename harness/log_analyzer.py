@@ -11,6 +11,10 @@ CRITICAL_KERNEL_PATTERNS = [
     r"segfault at",
 ]
 
+# אזהרות חומרה/BIOS ידועות של סימולטור QEMU שאינן תקלת קרנל אמיתית
+BENIGN_PATTERNS = [
+    r"MP-BIOS bug: 8254 timer not connected to IO-APIC",
+]
 
 def find_kernel_errors(log_text: str) -> List[str]:
     """
