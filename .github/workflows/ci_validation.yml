@@ -1,0 +1,50 @@
+name: Linux HIL Validation CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  hil-validation:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fetch prebuilt DUT artifacts (bzImage + initramfs)
+        run: make fetch-artifacts
+
+      - name: Static analysis (cppcheck) on C userspace daemon
+        run: |
+          sudo apt-get update && sudo apt-get install -y cppcheck
+          cppcheck --error-exitcode=1 --enable=warning,performance,portability \
+            dut/userspace_daemon/monitor_cli.c
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build validation Docker image with GHA Cache
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Dockerfile
+          load: true
+          tags: linux-hil-val-suite:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run full pytest HIL validation suite
+        run: make test
+
+      - name: Upload HTML Report, JUnit XML, and Triage Bundles
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hil-validation-reports
+          path: |
+            reports/
+            logs/serial.log
+          retention-days: 14
